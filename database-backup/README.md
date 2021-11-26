@@ -1,0 +1,1 @@
+Requires `serviceAccount.json` to be present.
