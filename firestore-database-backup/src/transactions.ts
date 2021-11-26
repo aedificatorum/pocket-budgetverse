@@ -21,7 +21,7 @@ async function getAllTransactions() {
   const queryResult = await db
     .collection("transactions")
     .orderBy("reportingDateTicks")
-    .limit(10)
+    .limit(10) // TODO: There's no limit (download all)
     .get();
 
   const allItems = queryResult.docs.map((d) => <any>{ ...d.data(), id: d.id });
