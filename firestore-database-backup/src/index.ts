@@ -33,16 +33,16 @@ initializeApp({
   const transactionsFileStream = fs.createWriteStream(
     "./output/transactions.jsonl"
   );
-  const transactionsStringifier = jsonlines.stringify();
-  transactionsStringifier.pipe(transactionsFileStream);
+  const transactionStringifier = jsonlines.stringify();
+  transactionStringifier.pipe(transactionsFileStream);
   transactions.forEach((transaction) =>
-    transactionsStringifier.write(transaction)
+    transactionStringifier.write(transaction)
   );
-  transactionsStringifier.end();
+  transactionStringifier.end();
 
   const accountsFileStream = fs.createWriteStream("./output/accounts.jsonl");
-  const accountsFileStringifier = jsonlines.stringify();
-  accountsFileStringifier.pipe(accountsFileStream);
-  accounts.forEach((account) => accountsFileStringifier.write(account));
-  accountsFileStringifier.end();
+  const accountStringifier = jsonlines.stringify();
+  accountStringifier.pipe(accountsFileStream);
+  accounts.forEach((account) => accountStringifier.write(account));
+  accountStringifier.end();
 })();
