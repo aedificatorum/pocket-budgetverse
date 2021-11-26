@@ -1,3 +1,5 @@
+import * as jsonlines from "jsonlines";
+import * as fs from "fs";
 import { initializeApp, cert, ServiceAccount } from "firebase-admin/app";
 import { getAllAccounts } from "./accounts";
 import serviceAccount from "./serviceAccount.json";
@@ -11,14 +13,36 @@ initializeApp({
 
 (async () => {
   const [transactions, transactionWarnings] = await getAllTransactions();
-  console.log(transactions);
-  console.log(transactionWarnings);
-  
-  const [accounts, accountWarnings] = await getAllAccounts();
-  console.log(accounts);
-  console.log(accountWarnings);
 
-  // TODO: Format as json lines
-  // TODO: Save data to disk
-  // TODO: Decide what to do in the presence of warnings
+  const [accounts, accountWarnings] = await getAllAccounts();
+
+  if (transactionWarnings.length > 0 || accountWarnings.length > 0) {
+    console.log("Account Warnings");
+    console.log(accountWarnings);
+
+    console.log();
+
+    console.log("Transaction Warnings");
+    console.log(transactionWarnings);
+
+    // TODO: Early exit on warnings?
+  }
+
+  // TODO: New output folder for each date+time of run?
+
+  const transactionsFileStream = fs.createWriteStream(
+    "./output/transactions.jsonl"
+  );
+  const transactionsStringifier = jsonlines.stringify();
+  transactionsStringifier.pipe(transactionsFileStream);
+  transactions.forEach((transaction) =>
+    transactionsStringifier.write(transaction)
+  );
+  transactionsStringifier.end();
+
+  const accountsFileStream = fs.createWriteStream("./output/accounts.jsonl");
+  const accountsFileStringifier = jsonlines.stringify();
+  accountsFileStringifier.pipe(accountsFileStream);
+  accounts.forEach((account) => accountsFileStringifier.write(account));
+  accountsFileStringifier.end();
 })();
