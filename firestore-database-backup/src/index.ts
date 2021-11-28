@@ -5,15 +5,28 @@ import { getAllAccounts } from "./accounts";
 import serviceAccount from "./serviceAccount.json";
 import { getAllTransactions } from "./transactions";
 
+function writeToFile(fileName: string, data: any[]) {
+  // TODO: New output folder for each date+time of run?
+  const fileStream = fs.createWriteStream(
+    `./output/${fileName}.jsonl`
+  );
+  const stringifier = jsonlines.stringify();
+  stringifier.pipe(fileStream);
+  data.forEach((datum) =>
+    stringifier.write(datum)
+  );
+  stringifier.end();
+}
+
 // TODO: Support getting the service account for injection in an action/environment
 // Might not be necessary depending where this is deployed (e.g. a function app where we can also deploy the json file)
 initializeApp({
   credential: cert(serviceAccount as ServiceAccount),
 });
 
+
 (async () => {
   const [transactions, transactionWarnings] = await getAllTransactions();
-
   const [accounts, accountWarnings] = await getAllAccounts();
 
   if (transactionWarnings.length > 0 || accountWarnings.length > 0) {
@@ -28,21 +41,6 @@ initializeApp({
     // TODO: Early exit on warnings?
   }
 
-  // TODO: New output folder for each date+time of run?
-
-  const transactionsFileStream = fs.createWriteStream(
-    "./output/transactions.jsonl"
-  );
-  const transactionStringifier = jsonlines.stringify();
-  transactionStringifier.pipe(transactionsFileStream);
-  transactions.forEach((transaction) =>
-    transactionStringifier.write(transaction)
-  );
-  transactionStringifier.end();
-
-  const accountsFileStream = fs.createWriteStream("./output/accounts.jsonl");
-  const accountStringifier = jsonlines.stringify();
-  accountStringifier.pipe(accountsFileStream);
-  accounts.forEach((account) => accountStringifier.write(account));
-  accountStringifier.end();
+  writeToFile("transactions", transactions);
+  writeToFile("accounts", accounts);
 })();
