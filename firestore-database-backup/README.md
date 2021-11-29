@@ -1,4 +1,4 @@
-## Prerequisites
+## Prerequisites
 
 Requires `src/serviceAccount.json` to be present, download from:
 
