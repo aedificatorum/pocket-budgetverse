@@ -5,10 +5,13 @@ import { getAllAccounts } from "./accounts";
 import serviceAccount from "./serviceAccount.json";
 import { getAllTransactions } from "./transactions";
 
-function writeToFile(fileName: string, data: any[]) {
-  // TODO: New output folder for each date+time of run?
+function writeToFile(folderName: string, fileName: string, data: any[]) {
+  if(!fs.existsSync(folderName)) {
+    fs.mkdirSync(folderName);
+  }
+
   const fileStream = fs.createWriteStream(
-    `./output/${fileName}.jsonl`
+    `./${folderName}/${fileName}.jsonl`
   );
   const stringifier = jsonlines.stringify();
   stringifier.pipe(fileStream);
@@ -41,6 +44,9 @@ initializeApp({
     // TODO: Early exit on warnings?
   }
 
-  writeToFile("transactions", transactions);
-  writeToFile("accounts", accounts);
+  // output/YYYY-MM-ddTHH-mm-ss.jsonl
+  const outputFolder = `output/${new Date().toISOString().slice(0,19).replace(/:/g,"-")}`;
+
+  writeToFile(outputFolder, "transactions", transactions);
+  writeToFile(outputFolder, "accounts", accounts);
 })();

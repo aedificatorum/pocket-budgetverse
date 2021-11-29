@@ -119,4 +119,4 @@ dist
 
 build/
 serviceAccount.json
-output/*.jsonl
+output/
