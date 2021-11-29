@@ -29,6 +29,8 @@ initializeApp({
 
 
 (async () => {
+  // Pull all data from firestore
+  // Warnings will exist if any records are missing required data
   const [transactions, transactionWarnings] = await getAllTransactions();
   const [accounts, accountWarnings] = await getAllAccounts();
 
@@ -44,9 +46,15 @@ initializeApp({
     // TODO: Early exit on warnings?
   }
 
+  if(!fs.existsSync("output")) {
+    fs.mkdirSync("output");
+  }
   // output/YYYY-MM-ddTHH-mm-ss.jsonl
   const outputFolder = `output/${new Date().toISOString().slice(0,19).replace(/:/g,"-")}`;
 
   writeToFile(outputFolder, "transactions", transactions);
   writeToFile(outputFolder, "accounts", accounts);
+
+  // PowerShell script expects to see ...to:output/rest of path
+  console.log(`Output written to:${outputFolder}`);
 })();
